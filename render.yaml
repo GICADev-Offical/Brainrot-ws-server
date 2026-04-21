@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: brainrot-ws
+    name: brainrot-ws-server
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python3 app.py
+    startCommand: python3 app.py  
