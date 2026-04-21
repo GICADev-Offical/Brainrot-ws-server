@@ -61,9 +61,17 @@ async def update():
                 await asyncio.gather(*[c.send(obf) for c in connected_clients])
         await asyncio.sleep(15)
 
+# ... (der gesamte Code davor bleibt gleich) ...
+
 async def main():
-    async with websockets.serve(handle, "0.0.0.0", 8080):
-        print("🌐 WebSocket läuft auf Port 8080")
+    # WICHTIG: Render erwartet WebSockets auf dem von IHM zugewiesenen Port,
+    # nicht auf einem festen wie 8080.
+    import os
+    port = int(os.environ.get("PORT", 8080))
+    
+    # WebSocket-Server auf dem RICHTIGEN Port starten
+    async with websockets.serve(handle, "0.0.0.0", port):
+        print(f"🌐 WebSocket läuft auf Port {port}")
         await update()
 
 if __name__ == "__main__":
