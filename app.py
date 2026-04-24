@@ -9,8 +9,8 @@ app = Flask(__name__)
 
 # === KONFIGURATION ===
 PLACE_ID = "109983668079237"
-MIN_PLAYERS = 2
-MAX_PLAYERS = 7
+MIN_PLAYERS = 4
+MAX_PLAYERS = 8
 SECRET_KEY = 42
 MAX_RESULTS = 20  # ⬅️ Bis zu 20 Job-IDs speichern!
 SCAN_COOLDOWN = 15  # Sekunden zwischen Vollscans
