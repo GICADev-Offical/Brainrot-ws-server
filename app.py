@@ -8,8 +8,8 @@ app = Flask(__name__)
 
 # === KONFIGURATION ===
 PLACE_ID = "109983668079237"
-MIN_PLAYERS = 2
-MAX_PLAYERS = 7
+MIN_PLAYERS = 1
+MAX_PLAYERS = 8
 SECRET_KEY = 42
 # =====================
 
