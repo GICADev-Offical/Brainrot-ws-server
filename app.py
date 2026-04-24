@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 PLACE_ID = "109983668079237"
 MIN_PLAYERS = 3
-MAX_PLAYERS = 4
+MAX_PLAYERS = 8
 
 current_job_id = None
 current_players = 0
