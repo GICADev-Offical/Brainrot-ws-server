@@ -8,21 +8,10 @@ app = Flask(__name__)
 PLACE_ID = "109983668079237"
 MIN_PLAYERS = 3
 MAX_PLAYERS = 4
-SECRET_KEY = 42
 
 current_job_id = None
 current_players = 0
 last_scan_time = "Nie"
-
-def obfuscate_hex(job_id):
-    """Einfache Hex-Obfuscation (Delta-kompatibel)"""
-    if not job_id:
-        return ""
-    result = ""
-    for c in job_id:
-        hex_val = format(ord(c) ^ SECRET_KEY, "02x")
-        result += hex_val
-    return result
 
 def get_server():
     global current_players, last_scan_time
@@ -56,7 +45,7 @@ def get_job_id():
     job_id = get_server()
     if job_id:
         current_job_id = job_id
-        return obfuscate_hex(job_id)  # Hex-obfuskiert
+        return job_id  # KLARTEXT!
     return "WAITING"
 
 @app.route('/status')
