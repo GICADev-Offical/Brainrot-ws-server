@@ -1,7 +1,10 @@
 import os
-from flask import Flask, jsonify, request
-import requests
+import asyncio
+import json
 from datetime import datetime
+import requests
+from flask import Flask, jsonify, request
+import threading
 
 app = Flask(__name__)
 
@@ -11,17 +14,13 @@ MAX_PLAYERS = 7
 
 current_job_id = None
 current_players = 0
-last_scan_time = "Nie"
-
-# Speicher für Bot-Funde
 bot_finds = []
 
 def get_server():
-    global current_players, last_scan_time
+    global current_players
     url = f"https://games.roblox.com/v1/games/{PLACE_ID}/servers/Public?limit=100"
     try:
         r = requests.get(url, timeout=10)
-        last_scan_time = datetime.now().strftime("%H:%M:%S")
         if r.status_code == 200:
             data = r.json()
             best = None
@@ -38,9 +37,34 @@ def get_server():
         pass
     return None
 
+# WebSocket Handler (Simple)
+async def ws_handler(websocket, path):
+    async for message in websocket:
+        try:
+            data = json.loads(message)
+            if data.get("type") == "botreport":
+                data['reported_at'] = datetime.now().strftime("%H:%M:%S")
+                bot_finds.insert(0, data)
+                if len(bot_finds) > 20:
+                    bot_finds.pop()
+                await websocket.send(json.dumps({"status": "ok"}))
+        except:
+            pass
+
+def start_ws_server():
+    import websockets
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    server = websockets.serve(ws_handler, "0.0.0.0", 8080)
+    loop.run_until_complete(server)
+    loop.run_forever()
+
+# Starte WebSocket in eigenem Thread
+threading.Thread(target=start_ws_server, daemon=True).start()
+
 @app.route('/')
 def home():
-    return "✅ FallenHub AutoJoiner läuft!"
+    return "✅ FallenHub läuft!"
 
 @app.route('/jobid')
 def get_job_id():
@@ -53,19 +77,12 @@ def get_job_id():
 
 @app.route('/status')
 def get_status():
-    return jsonify({
-        "status": "online",
-        "job_id": current_job_id or "Keine",
-        "players": current_players,
-        "filter": f"{MIN_PLAYERS}-{MAX_PLAYERS} Spieler",
-        "bot_finds": len(bot_finds)
-    })
+    return jsonify({"status": "online", "bot_finds": len(bot_finds)})
 
-# NEU: Bot meldet Fund
 @app.route('/botreport', methods=['POST'])
 def bot_report():
     data = request.json
-    if data and 'jobId' in data:
+    if data:
         data['reported_at'] = datetime.now().strftime("%H:%M:%S")
         bot_finds.insert(0, data)
         if len(bot_finds) > 20:
@@ -73,7 +90,6 @@ def bot_report():
         return jsonify({"status": "ok"})
     return jsonify({"status": "error"}), 400
 
-# NEU: Funde abrufen
 @app.route('/botfinds')
 def get_bot_finds():
     return jsonify(bot_finds)
