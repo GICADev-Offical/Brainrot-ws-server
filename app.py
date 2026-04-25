@@ -37,7 +37,7 @@ def get_server():
 
 @app.route('/')
 def home():
-    return "✅ FallenHub AutoJoiner läuft!"
+    return "Brainrot AutoJoiner laeuft!"
 
 @app.route('/jobid')
 def get_job_id():
@@ -54,8 +54,7 @@ def get_status():
         "status": "online",
         "job_id": current_job_id or "Keine",
         "players": current_players,
-        "filter": f"{MIN_PLAYERS}-{MAX_PLAYERS} Spieler",
-        "last_scan": last_scan_time
+        "filter": f"{MIN_PLAYERS}-{MAX_PLAYERS} Spieler"
     })
 
 if __name__ == "__main__":
